@@ -1,6 +1,9 @@
 package com.sample.hotel.entity;
 
+import io.jmix.core.MetadataTools;
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
+import io.jmix.core.metamodel.annotation.DependsOnProperties;
+import io.jmix.core.metamodel.annotation.InstanceName;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 import org.hibernate.validator.constraints.Length;
 
@@ -77,4 +80,11 @@ public class Client {
         this.id = id;
     }
 
+    @InstanceName
+    @DependsOnProperties({"firstName", "lastName"})
+    public String getInstanceName(MetadataTools metadataTools) {
+        return String.format("%s %s",
+                metadataTools.format(firstName),
+                metadataTools.format(lastName));
+    }
 }
