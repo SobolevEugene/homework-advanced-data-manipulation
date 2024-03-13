@@ -1,112 +1,123 @@
 package com.sample.hotel.entity;
 
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
+import io.jmix.core.metamodel.annotation.DependsOnProperties;
 import io.jmix.core.metamodel.annotation.JmixEntity;
+import io.jmix.core.metamodel.annotation.JmixProperty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
 @JmixEntity
 @Table(name = "BOOKING", indexes = {
-        @Index(name = "IDX_BOOKING_CLIENT", columnList = "CLIENT_ID")
+		@Index(name = "IDX_BOOKING_CLIENT", columnList = "CLIENT_ID")
 })
 @Entity
 public class Booking {
-    @JmixGeneratedValue
-    @Column(name = "ID", nullable = false)
-    @Id
-    private UUID id;
+	@JmixGeneratedValue
+	@Column(name = "ID", nullable = false)
+	@Id
+	private UUID id;
 
-    @JoinColumn(name = "CLIENT_ID", nullable = false)
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Client client;
+	@JoinColumn(name = "CLIENT_ID", nullable = false)
+	@NotNull
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	private Client client;
 
-    @NotNull
-    @Column(name = "NUMBER_OF_GUESTS", nullable = false)
-    private Integer numberOfGuests;
+	@NotNull
+	@Column(name = "NUMBER_OF_GUESTS", nullable = false)
+	private Integer numberOfGuests;
 
-    @Column(name = "ARRIVAL_DATE", nullable = false)
-    @NotNull
-    private LocalDate arrivalDate;
+	@Column(name = "ARRIVAL_DATE", nullable = false)
+	@NotNull
+	private LocalDate arrivalDate;
 
-    @Column(name = "NIGHTS_OF_STAY", nullable = false)
-    @NotNull
-    private Integer nightsOfStay;
+	@Column(name = "NIGHTS_OF_STAY", nullable = false)
+	@NotNull
+	private Integer nightsOfStay;
 
-    @Column(name = "DEPARTURE_DATE")
-    private LocalDate departureDate;
+	@Column(name = "DEPARTURE_DATE")
+	private LocalDate departureDate;
 
-    @Column(name = "STATUS", nullable = false)
-    @NotNull
-    private String status;
+	@Column(name = "STATUS", nullable = false)
+	@NotNull
+	private String status;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "booking")
-    private RoomReservation roomReservation;
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "booking")
+	private RoomReservation roomReservation;
 
-    public LocalDate getDepartureDate() {
-        return departureDate;
-    }
+	@DependsOnProperties({"arrivalDate"})
+	@JmixProperty
+	public Integer getCountdownDays() {
+		int daysLeft = (int) DAYS.between(LocalDate.now(), arrivalDate);
+		return daysLeft > 0 ? daysLeft : 0;
+	}
 
-    public void setDepartureDate(LocalDate departureDate) {
-        this.departureDate = departureDate;
-    }
+	public LocalDate getDepartureDate() {
+		return departureDate;
+	}
 
-    public RoomReservation getRoomReservation() {
-        return roomReservation;
-    }
+	public void setDepartureDate(LocalDate departureDate) {
+		this.departureDate = departureDate;
+	}
 
-    public void setRoomReservation(RoomReservation roomReservation) {
-        this.roomReservation = roomReservation;
-    }
+	public RoomReservation getRoomReservation() {
+		return roomReservation;
+	}
 
-    public BookingStatus getStatus() {
-        return status == null ? null : BookingStatus.fromId(status);
-    }
+	public void setRoomReservation(RoomReservation roomReservation) {
+		this.roomReservation = roomReservation;
+	}
 
-    public void setStatus(BookingStatus status) {
-        this.status = status == null ? null : status.getId();
-    }
+	public BookingStatus getStatus() {
+		return status == null ? null : BookingStatus.fromId(status);
+	}
 
-    public Integer getNightsOfStay() {
-        return nightsOfStay;
-    }
+	public void setStatus(BookingStatus status) {
+		this.status = status == null ? null : status.getId();
+	}
 
-    public void setNightsOfStay(Integer nightsOfStay) {
-        this.nightsOfStay = nightsOfStay;
-    }
+	public Integer getNightsOfStay() {
+		return nightsOfStay;
+	}
 
-    public LocalDate getArrivalDate() {
-        return arrivalDate;
-    }
+	public void setNightsOfStay(Integer nightsOfStay) {
+		this.nightsOfStay = nightsOfStay;
+	}
 
-    public void setArrivalDate(LocalDate arrivalDate) {
-        this.arrivalDate = arrivalDate;
-    }
+	public LocalDate getArrivalDate() {
+		return arrivalDate;
+	}
 
-    public Integer getNumberOfGuests() {
-        return numberOfGuests;
-    }
+	public void setArrivalDate(LocalDate arrivalDate) {
+		this.arrivalDate = arrivalDate;
+	}
 
-    public void setNumberOfGuests(Integer numberOfGuests) {
-        this.numberOfGuests = numberOfGuests;
-    }
+	public Integer getNumberOfGuests() {
+		return numberOfGuests;
+	}
 
-    public Client getClient() {
-        return client;
-    }
+	public void setNumberOfGuests(Integer numberOfGuests) {
+		this.numberOfGuests = numberOfGuests;
+	}
 
-    public void setClient(Client client) {
-        this.client = client;
-    }
+	public Client getClient() {
+		return client;
+	}
 
-    public UUID getId() {
-        return id;
-    }
+	public void setClient(Client client) {
+		this.client = client;
+	}
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+	public UUID getId() {
+		return id;
+	}
+
+	public void setId(UUID id) {
+		this.id = id;
+	}
 }
