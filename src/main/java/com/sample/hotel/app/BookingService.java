@@ -3,7 +3,9 @@ package com.sample.hotel.app;
 import com.sample.hotel.entity.Booking;
 import com.sample.hotel.entity.Room;
 import com.sample.hotel.entity.RoomReservation;
+import io.jmix.core.DataManager;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -11,8 +13,13 @@ import javax.persistence.PersistenceContext;
 @Component
 public class BookingService {
 
+	private final DataManager dataManager;
 	@PersistenceContext
 	private EntityManager entityManager;
+
+	public BookingService(DataManager dataManager) {
+		this.dataManager = dataManager;
+	}
 
 	/**
 	 * Check if given room is suitable for the booking.
@@ -36,7 +43,7 @@ public class BookingService {
 				.setParameter("roomId", room.getId())
 				.setParameter("bookingArrivalDate", booking.getArrivalDate())
 				.setParameter("bookingDepartureDate", booking.getDepartureDate())
-				.getSingleResult() > 0;
+				.getSingleResult() == 0;
 
 		return sleepingPlacesCondition && dateCondition;
 	}
@@ -49,8 +56,14 @@ public class BookingService {
 	 *                Wrap operation into a transaction (declarative or manual).
 	 * @return created reservation object, or null if room is not suitable
 	 */
+	@Transactional
 	public RoomReservation reserveRoom(Booking booking, Room room) {
-		//todo implement me!
-		return null;
+		if (!isSuitable(booking, room)) {
+			return null;
+		}
+		RoomReservation roomReservation = dataManager.create(RoomReservation.class);
+		roomReservation.setRoom(room);
+		roomReservation.setBooking(booking);
+		return dataManager.save(roomReservation);
 	}
 }
