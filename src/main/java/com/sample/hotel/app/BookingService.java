@@ -4,6 +4,7 @@ import com.sample.hotel.entity.Booking;
 import com.sample.hotel.entity.Room;
 import com.sample.hotel.entity.RoomReservation;
 import io.jmix.core.DataManager;
+import io.jmix.core.Id;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,5 +66,13 @@ public class BookingService {
 		roomReservation.setRoom(room);
 		roomReservation.setBooking(booking);
 		return dataManager.save(roomReservation);
+	}
+
+	public void cancelRoomReservation(Id bookingId) {
+		RoomReservation roomReservation = dataManager.loadValue("select r from RoomReservation r " +
+						"where r.booking.id = :bookingId",
+				RoomReservation.class).parameter("bookingId", bookingId).one();
+
+		dataManager.remove(roomReservation);
 	}
 }
